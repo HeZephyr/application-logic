@@ -29,4 +29,11 @@ namespace Peano_Numbers {
     struct Mul : Peano{
         static constexpr int value = A::value * B::value;
     };
+
+    // Divide operation
+    template <class A, class B>
+    struct Div : Peano{
+        static_assert(B::value != 0, "Division by zero");
+        static constexpr int value = A::value / B::value;
+    };
 }
