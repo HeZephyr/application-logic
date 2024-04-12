@@ -1,0 +1,12 @@
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# 忽略编译生成的文件
+*.o
+*.out
+*.exe
+
+# 忽略IDE和编辑器生成的文件
+.idea/
+.vscode/
