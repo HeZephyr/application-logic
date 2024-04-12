@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++11
 
-SRCS   := test_add.cpp test_sub.cpp
+SRCS   := test_add.cpp test_sub.cpp test_mul.cpp
 
 
 OBJS   := ${SRCS:cpp=o}
