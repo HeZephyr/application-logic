@@ -36,4 +36,31 @@ namespace Peano_Numbers {
         static_assert(B::value != 0, "Division by zero");
         static constexpr int value = A::value / B::value;
     };
+
+    // Even operation
+    template <class A>
+    struct Even : Peano{
+        static constexpr bool value = A::value % 2 == 0;
+    };
+
+    // Odd operation
+    template <class A>
+    struct Odd : Peano{
+        static constexpr bool value = A::value % 2 != 0;
+    };
+    // LT, Less than operation
+    template <class A, class B>
+    struct LT : Peano{
+        static constexpr bool value = A::value < B::value;
+    };
+    // GT, Greater than operation
+    template <class A, class B>
+    struct GT : Peano{
+        static constexpr bool value = A::value > B::value;
+    };
+    // EQ, Equal operation
+    template <class A, class B>
+    struct EQ : Peano{
+        static constexpr bool value = A::value == B::value;
+    };
 }
