@@ -7,7 +7,7 @@ using namespace std;
 
 class RationalNumber {
 public:
-    RationalNumber(int numerator, int denominator) : num(numerator), den(denominator) {}
+    RationalNumber(int numerator, int denominator, int symbol = 1) : num(numerator), den(denominator), symbol(symbol) {}
 
     // Function to simplify the rational number
     RationalNumber simplify() {
@@ -28,23 +28,29 @@ public:
 
     // Overloading the < operator for comparing rational numbers
     bool operator<(const RationalNumber& other) const {
-        return num * other.den < other.num * den;
+        return symbol * num * other.den < other.symbol * other.num * den;
     }
 
     // Overloading the == operator for checking equality of rational numbers
     bool operator==(const RationalNumber& other) const {
-        return num * other.den == other.num * den;
+        return symbol * num * other.den == other.symbol * other.num * den;
     }
 
     // Overloading the << operator for printing
     friend ostream& operator<<(ostream& os, const RationalNumber& rational) {
+        if (rational.symbol == -1) os << "-";
         os << rational.num << "/" << rational.den;
         return os;
     }
 
+    void set_symbol(int s) {
+        symbol = s;
+    }
+
 private:
-    int num;
-    int den;
+    int num;    // numerator
+    int den;    // denominator, den != 0
+    int symbol; // 1 for positive, -1 for negative
 
     // Function to calculate the greatest common divisor
     int gcd(int a, int b) {
@@ -60,11 +66,18 @@ private:
 // use the set to remove redundant rationals
 set<RationalNumber> generateRationals(int N) {
     set<RationalNumber> rationals;
-    RationalNumber cur = RationalNumber(1, 1);
+    RationalNumber cur = RationalNumber(0, 1);
     rationals.insert(cur.simplify());
     while (rationals.size() < N) {
         cur = cur.next();
-        rationals.insert(cur.simplify());
+        RationalNumber temp = cur.simplify();
+        rationals.insert(temp);
+
+        if (rationals.size() >= N) break;
+
+        // get its opposite
+        temp.set_symbol(-1);
+        rationals.insert(temp);
     }
     return rationals;
 }
