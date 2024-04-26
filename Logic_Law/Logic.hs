@@ -5,22 +5,27 @@ data Logic = A | B | C
   | Or Logic Logic
   | Not Logic
   | Imply Logic Logic
-  | Equiv Logic Logic
+  | Equiv Logic Logic 
   deriving (Eq, Show)
 
 -- Distribute function applying the distributive law
 distribute :: Logic -> Logic
-distribute (And a (Or b c)) = Or (And a b) (And a c)
-distribute (Or a (And b c)) = And (Or a b) (Or a c)
-distribute (And a b) = And (distribute a) (distribute b)
-distribute (Or a b) = Or (distribute a) (distribute b)
-distribute x = x  -- No distribution needed for other cases
+distribute (Or p (And q r)) = And (Or (distribute p) (distribute q)) (Or (distribute p) (distribute r))
+distribute (Or (And p q) r) = And (Or (distribute p) (distribute r)) (Or (distribute q) (distribute r))
+distribute (And p q) = And (distribute p) (distribute q)
+distribute (Or p q) = Or (distribute p) (distribute q)
+distribute (Not p) = Not (distribute p)
+distribute (Imply p q) = Imply (distribute p) (distribute q)
+distribute (Equiv p q) = Equiv (distribute p) (distribute q)
+distribute p = p  -- No distribution needed for other cases
 
 -- deMorgan function applying De Morgan's laws
 deMorgan :: Logic -> Logic
-deMorgan (Not (And a b)) = Or (Not a) (Not b)
-deMorgan (Not (Or a b)) = And (Not a) (Not b)
-deMorgan (Not x) = Not (deMorgan x)
-deMorgan (And a b) = And (deMorgan a) (deMorgan b)
-deMorgan (Or a b) = Or (deMorgan a) (deMorgan b)
-deMorgan x = x  -- No De Morgan's law applies to other cases
+deMorgan (Not (Or p q)) = And (Not (deMorgan p)) (Not (deMorgan q))
+deMorgan (Not (And p q)) = Or (Not (deMorgan p)) (Not (deMorgan q))
+deMorgan (And p q) = And (deMorgan p) (deMorgan q)
+deMorgan (Or p q) = Or (deMorgan p) (deMorgan q)
+deMorgan (Not p) = Not (deMorgan p)
+deMorgan (Imply p q) = Imply (deMorgan p) (deMorgan q)
+deMorgan (Equiv p q) = Equiv (deMorgan p) (deMorgan q)
+deMorgan p = p  -- No De Morgan's law applies to other cases
