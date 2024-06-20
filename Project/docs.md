@@ -3,7 +3,16 @@
 You're cordially invited to develop a reasoner for EL or its extensions, then apply the normalisation procedure to the TBox
 
 $$
-\begin{aligned}\mathcal{T}&=\{\begin{array}{ccc}A&\sqsubseteq&B&\sqcap&\exists r.C\end{array},\\&\begin{array}{ccc}C&\sqsubseteq&\exists s.D,\\\exists r.\exists s.\top&\sqcap&B&\sqsubseteq&D\end{array}\}\end{aligned}
+\begin{aligned}
+\mathcal{T} = \left\lbrace
+\begin{array}{ccc}
+A & \sqsubseteq & B \sqcap \exists r.C, \\
+& \\
+C & \sqsubseteq & \exists s.D, \\
+\exists r.\exists s.\top & \sqcap & B \sqsubseteq D
+\end{array}
+\right\rbrace
+\end{aligned}
 $$
 
 and then check whether it entails
