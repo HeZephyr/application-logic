@@ -1,4 +1,7 @@
 class Concept:
+    """
+    Represents a concept in Description Logic, identified by a unique name.
+    """
     def __init__(self, name):
         self.name = name
 
@@ -12,6 +15,9 @@ class Concept:
         return self.name
 
 class Role:
+    """
+    Represents a role (also known as a property or relationship) connecting concepts in Description Logic.
+    """
     def __init__(self, name):
         self.name = name
 
@@ -25,6 +31,10 @@ class Role:
         return self.name
 
 class Existential:
+    """
+    Represents an existential restriction in Description Logic, indicating that there exists an object
+    related via a role that satisfies a certain concept.
+    """
     def __init__(self, role, concept):
         self.role = role
         self.concept = concept
@@ -39,6 +49,9 @@ class Existential:
         return f"∃{self.role}.{self.concept}"
 
 class Conjunction:
+    """
+    Represents the conjunction (AND operation) of two concepts.
+    """
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -53,6 +66,9 @@ class Conjunction:
         return f"({self.left} ⊓ {self.right})"
 
 class Subsumption:
+    """
+    Represents a subsumption (subclass) relationship between two concepts.
+    """
     def __init__(self, sub, sup):
         self.sub = sub
         self.sup = sup
@@ -67,6 +83,9 @@ class Subsumption:
         return f"{self.sub} ⊑ {self.sup}"
 
 class TBox:
+    """
+    Represents a Terminology Box (TBox), containing a set of subsumption axioms defining the concept hierarchy.
+    """
     def __init__(self, axioms=None):
         self.axioms = axioms if axioms else set()
 
@@ -79,16 +98,19 @@ class TBox:
         for axiom in self.axioms:
             print(f"Processing {axiom}")
             if isinstance(axiom.sub, Conjunction):
+                # If the subsumption has a conjunction on the left side
                 normalized_tbox.add(Subsumption(axiom.sub.left, axiom.sup))
                 normalized_tbox.add(Subsumption(axiom.sub.right, axiom.sup))
                 print(f"Added {Subsumption(axiom.sub.left, axiom.sup)}")
                 print(f"Added {Subsumption(axiom.sub.right, axiom.sup)}")
             elif isinstance(axiom.sup, Conjunction):
+                # If the subsumption has a conjunction on the right side
                 normalized_tbox.add(Subsumption(axiom.sub, axiom.sup.left))
                 normalized_tbox.add(Subsumption(axiom.sub, axiom.sup.right))
                 print(f"Added {Subsumption(axiom.sub, axiom.sup.left)}")
                 print(f"Added {Subsumption(axiom.sub, axiom.sup.right)}")
             else:
+                # If the subsumption is a regular subsumption
                 normalized_tbox.add(axiom)
                 print(f"Added {axiom}")
         print("Normalization complete.\n")
@@ -105,6 +127,7 @@ class TBox:
             for axiom1 in closure_set:
                 for axiom2 in closure_set:
                     if isinstance(axiom1.sup, Concept) and axiom1.sup == axiom2.sub:
+                        # If there is a match for subsumption and concept
                         new_axiom = Subsumption(axiom1.sub, axiom2.sup)
                         if new_axiom not in closure_set:
                             new_axioms.add(new_axiom)
