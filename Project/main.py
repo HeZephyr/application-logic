@@ -11,6 +11,19 @@ class Concept:
     def __repr__(self):
         return self.name
 
+class Role:
+    def __init__(self, name):
+        self.name = name
+
+    def __eq__(self, other):
+        return isinstance(other, Role) and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __repr__(self):
+        return self.name
+
 class Existential:
     def __init__(self, role, concept):
         self.role = role
@@ -62,20 +75,30 @@ class TBox:
 
     def normalize(self):
         normalized_tbox = set()
+        print("Normalizing TBox:")
         for axiom in self.axioms:
+            print(f"Processing {axiom}")
             if isinstance(axiom.sub, Conjunction):
                 normalized_tbox.add(Subsumption(axiom.sub.left, axiom.sup))
                 normalized_tbox.add(Subsumption(axiom.sub.right, axiom.sup))
+                print(f"Added {Subsumption(axiom.sub.left, axiom.sup)}")
+                print(f"Added {Subsumption(axiom.sub.right, axiom.sup)}")
             elif isinstance(axiom.sup, Conjunction):
                 normalized_tbox.add(Subsumption(axiom.sub, axiom.sup.left))
                 normalized_tbox.add(Subsumption(axiom.sub, axiom.sup.right))
+                print(f"Added {Subsumption(axiom.sub, axiom.sup.left)}")
+                print(f"Added {Subsumption(axiom.sub, axiom.sup.right)}")
             else:
                 normalized_tbox.add(axiom)
+                print(f"Added {axiom}")
+        print("Normalization complete.\n")
         return TBox(normalized_tbox)
 
     def closure(self):
         closure_set = set(self.axioms)
+        derivation = []
         added = True
+        print("Computing closure:")
         while added:
             added = False
             new_axioms = set()
@@ -85,17 +108,29 @@ class TBox:
                         new_axiom = Subsumption(axiom1.sub, axiom2.sup)
                         if new_axiom not in closure_set:
                             new_axioms.add(new_axiom)
+                            derivation.append((axiom1, axiom2, new_axiom))
                             added = True
+                            print(f"Derived {new_axiom} from {axiom1} and {axiom2}")
             closure_set.update(new_axioms)
-        return TBox(closure_set)
+        print("Closure computation complete.\n")
+        return TBox(closure_set), derivation
 
     def entails(self, query):
         normalized_tbox = self.normalize()
-        closure_tbox = normalized_tbox.closure()
-        return query in closure_tbox.axioms
+        closure_tbox, derivation = normalized_tbox.closure()
+        if query in closure_tbox.axioms:
+            return True, derivation
+        return False, derivation
 
     def __repr__(self):
         return "\n".join(str(axiom) for axiom in self.axioms)
+
+# Utility function to print the derivation process
+def print_derivation(derivation):
+    print("\nDerivation Process:")
+    for step in derivation:
+        axiom1, axiom2, result = step
+        print(f"From {axiom1} and {axiom2}, derive {result}")
 
 # Define concepts
 A = Concept("A")
@@ -105,8 +140,8 @@ D = Concept("D")
 top = Concept("⊤")
 
 # Define roles
-r = "r"
-s = "s"
+r = Role("r")
+s = Role("s")
 
 # Define TBox
 tbox = TBox({
@@ -115,15 +150,16 @@ tbox = TBox({
     Subsumption(Conjunction(Existential(r, Existential(s, top)), B), D)
 })
 
+# Print TBox
+print(f"TBox:\n{tbox}")
+
 # Define the query
-query = Subsumption(A, D)
+query = Subsumption(A, B)
+print(f"\nQuery: {query}\n")
 
 # Check entailment
-print("TBox:")
-print(tbox)
-print("\nQuery:", query)
+entails, derivation = tbox.entails(query)
 
-if tbox.entails(query):
-    print("\nThe TBox entails A ⊑ D.")
-else:
-    print("\nThe TBox does not entail A ⊑ D.")
+print(f"Entailment: {entails}")
+if entails:
+    print_derivation(derivation)
